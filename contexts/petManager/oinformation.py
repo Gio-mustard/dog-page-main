@@ -9,13 +9,27 @@ class OInformation:
         self.add(*args)
 
     @staticmethod
-    def __filter_types(*args):
+    def __filter_types(*args)->tuple:
         """
         This method filters out arguments that are of type None or bool.
         It returns a list of arguments that are not of these types.
         """
+        filtered_array = []
+        for arg in args:
+            arg_type = type(arg)
+            if arg_type in [type(None),bool]:
+                continue
+            if arg_type in [list,tuple,set]:
+                filtered_array.append(OInformation.__filter_types(*arg))
+                continue
+            
+            if arg_type in [dict]:
+                filtered_array.append((None,*OInformation.__filter_types(*[item for item in arg.items() if item[1] is not None ])))
+                continue
 
-        return [arg for arg in args if type(arg) not in [type(None), bool] ]
+            filtered_array.append(arg)
+
+        return tuple(filtered_array)
 
     def add(self, *args) -> None:
         """
@@ -37,7 +51,11 @@ class OInformation:
         It is not a reference to the original object, 
         and is intended for read-only purposes.
         """
-        return self.__schema.copy()
+        schema_copy = self.__schema.copy()
+        for item in schema_copy:
+            if type(item) is tuple and None in item:
+                item = dict(item[1::])
+            yield item   
     
 
 if __name__ == "__main__":
@@ -48,21 +66,29 @@ if __name__ == "__main__":
         
         # Test case 1: Adding arguments to the schema
         info = OInformation("dog", "brown", "friendly", "Max")
-        assert info.get() == {"dog", "brown", "friendly", "Max"}
+        assert set(info.get()) == {"dog", "brown", "friendly", "Max"}
 
         # Test case 2: Setting the schema with new arguments
         info.set("cat", "white", "playful", "Whiskers")
-        assert info.get() == {"cat", "white", "playful", "Whiskers"}
+        assert set(info.get()) == {"cat", "white", "playful", "Whiskers"}
 
         # Test case 3: Filtering out None and bool types
         info.set(None, True, "bird", "blue", "intelligent", "Sunny")
-        assert info.get() == {"bird", "blue", "intelligent", "Sunny"}
+        assert set(info.get()) == {"bird", "blue", "intelligent", "Sunny"}
 
         # Test case 4: Retrieving a copy of the schema
-        schema_copy = info.get()
+        schema_copy = set(info.get())
         assert isinstance(schema_copy, set)
         assert not schema_copy == {"cat", "white", "playful", "Whiskers", "bird", "blue", "intelligent", "Sunny"}
 
+        # Test case 5 : Sub info
+        info = OInformation(1,2,3,(4,5,6),{"key":"value",'1':2,"3":None})
+        schema_copy = tuple(info.get())
+        print(f"{schema_copy=}")
+        
+        for item in (1, 2, 3, (4, 5, 6), {"key": "value", '1': 2}):
+            assert item in schema_copy
+            
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"All tests passed successfully. Total time elapsed: {elapsed_time:.2f} seconds.")
