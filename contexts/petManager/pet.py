@@ -1,10 +1,12 @@
+from oinformation import OInformation
 class Pet:
     # this class is to read only
-    def __init__(self, race: str, color: str, description: str, name: str):
+    def __init__(self, race: str, color: str, description: str, name: str,info:OInformation):
         self.__race = race
         self.__color = color
         self.__description = description
         self.__name = name
+        self.__info = info
 
     @property
     def race(self):
@@ -21,6 +23,10 @@ class Pet:
     @property
     def name(self):
         return self.__name
+    
+    @property
+    def info(self) -> OInformation:
+        return self.__info
 
     def __str__(self):
         return f"Race: {self.__race}, Color: {self.__color}, Description: {self.__description}, Name: {self.__name}"
