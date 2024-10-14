@@ -1,9 +1,9 @@
 from oinformation import OInformation
 class Owner:
     # this class is read only
-    def __init__(self,name:str,addres:str,phone_number:str,info:OInformation,email:str) -> None:
+    def __init__(self,name:str,address:str,phone_number:str,info:OInformation,email:str) -> None:
         self.__name = name
-        self.__address = addres
+        self.__address = address
         self.__phone_number = phone_number
         self.__info = info
         self.__email = email
