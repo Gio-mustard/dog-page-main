@@ -38,7 +38,7 @@ if __name__ == "__main__":
     class TestPet(unittest.TestCase):
 
         def setUp(self):
-            self.pet = Pet(race="Golden Retriever", color="Golden", description="Friendly and energetic", name="Buddy")
+            self.pet = Pet(race="Golden Retriever", color="Golden", description="Friendly and energetic", name="Buddy",info=OInformation("dog", "brown", "friendly", "Max"))
 
         def test_race(self):
             print(colorama.Fore.GREEN + "Starting test: test_race")
@@ -71,6 +71,14 @@ if __name__ == "__main__":
             except AssertionError as e:
                 print(colorama.Fore.RED + str(e))
             print(colorama.Fore.GREEN + "Ending test: test_name")
+        
+        def test_info(self):
+            print(colorama.Fore.GREEN + "Starting test: test_info")
+            try:
+                self.assertEqual(self.pet.info.get(), {"dog", "brown", "friendly", "Max"}, "The info of the pet should match the expected format")
+            except AssertionError as e:
+                print(colorama.Fore.RED + str(e))
+            print(colorama.Fore.GREEN + "Ending test: test_info")
 
         def test_str(self):
             print(colorama.Fore.GREEN + "Starting test: test_str")
