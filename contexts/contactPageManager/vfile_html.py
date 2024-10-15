@@ -1,4 +1,8 @@
-from vfile import VirtualFile
+try:
+    from .vfile import VirtualFile
+except ImportError:
+    # When we are testing 
+    from vfile import VirtualFile
 class HTML(VirtualFile):
     HEAD_TAG = "head"
     BODY_TAG = "body"

@@ -1,5 +1,9 @@
-from vfile import VirtualFile
-from vfile_html import HTML
+if __name__ == "__main__":
+    from vfile import VirtualFile
+    from vfile_html import HTML
+else:
+    from .vfile import VirtualFile
+    from .vfile_html import HTML
 
 class ConctactPage:
     def __init__(self) -> None:
