@@ -1,6 +1,11 @@
-from pet import Pet
-from owner import Owner
-from oinformation import OInformation
+if __name__ == "__main__":
+    from pet import Pet
+    from owner import Owner
+    from oinformation import OInformation
+else:
+    from .pet import Pet
+    from .owner import Owner
+    from .oinformation import OInformation
 
 class PetInformation:
     def __init__(self) -> None:

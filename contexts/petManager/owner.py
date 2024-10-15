@@ -1,4 +1,10 @@
-from oinformation import OInformation
+if __name__ == "__main__":
+    from oinformation import OInformation
+else:
+    try:
+        from .oinformation import OInformation
+    except ImportError:
+        from oinformation import OInformation
 class Owner:
     # this class is read only
     def __init__(self,name:str,address:str,phone_number:str,info:OInformation,email:str) -> None:

@@ -1,4 +1,12 @@
-from oinformation import OInformation
+if __name__ == "__main__":
+    from oinformation import OInformation
+else:
+    try:
+        from .oinformation import OInformation
+    except ImportError:
+        # En caso de estar haciendo testing
+        from oinformation import OInformation
+
 class Pet:
     # this class is to read only
     def __init__(self, race: str, color: str, description: str, name: str,info:OInformation):
