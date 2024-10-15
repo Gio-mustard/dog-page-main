@@ -1,7 +1,6 @@
 if __name__ == "__main__":
-    from vfile import HTML
+    from vfile_html import HTML
     import unittest
-    from vfile import HTML
     import colorama
     colorama.init()
     print(colorama.Fore.GREEN + "Aqui empiezan los test de HTML" + colorama.Style.RESET_ALL)
