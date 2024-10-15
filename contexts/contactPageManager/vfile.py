@@ -35,13 +35,14 @@ class VirtualFile:
     def add(self,line:str,index:int=None):
         VirtualFile.__check_line_type(line)
         final_line = self._apply_rules(line)
-        if index is not None:
+
+        if index is not None and type(final_line)  not in (tuple,list):
             self.__raw.insert(abs(index), final_line)
         elif type(final_line) is str:
             self.__raw.append(final_line)
         elif type(final_line) in [tuple,list]:
-            for inline in final_line:
-                self.add(inline)
+            for inIndex,inline in enumerate(final_line):
+                self.add(inline,index+inIndex if index is not None else None)
 
     def remove(self,line:str=None,index:int=None):
         """
