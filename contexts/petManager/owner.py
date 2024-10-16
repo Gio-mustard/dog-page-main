@@ -49,7 +49,7 @@ if __name__ == "__main__":
             self.assertEqual(self.owner.name, "John Doe")
             self.assertEqual(self.owner.address, "123 Main St")
             self.assertEqual(self.owner.phone_number, "123-456-7890")
-            self.assertEqual(self.owner.info.get(), {"dog", "brown", "friendly", "Max"})
+            self.assertEqual(set(self.owner.info.get()), {"dog", "brown", "friendly", "Max"})
             self.assertEqual(self.owner.email, "johndoe@example.com")
 
         def test_owner_read_only(self):
