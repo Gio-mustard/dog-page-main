@@ -1,0 +1,3 @@
+Extract the race, color, name, and any extra details (e.g., medications, favorite color) from the following animal description as a JSON object. Use the exact properties as specified (race, color, description, name, extra). Ensure all values are in the same language as the provided description (which may be in Spanish or other languages).
+
+For "extra", format it as an array of objects or strings (e.g., {"title":..., "content":...}). If the content of an object is very short (10 characters or less), merge the title and content into a single string.
