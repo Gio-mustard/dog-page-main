@@ -76,6 +76,7 @@ class I:
         """
         path = self.__get_directory()
         self.__execute_commands(path)
+        path+= "/dist/"
         
         object_data = self.__prepare_object_data()
 
@@ -92,7 +93,7 @@ class I:
 
     def __get_directory(self) -> str:
         path = r"./template-page/"
-        path = os.path.abspath(path) + r"/dist/"
+        path = os.path.abspath(path)
         path = path.replace("\\", "/")
         print(f'JSON:{path=}')
         return path
@@ -103,9 +104,30 @@ class I:
         It pulls the latest code from the main branch of a Git repository, lists the directory contents, installs Node.js dependencies,
         and builds the project using npm. The output of the commands is captured and printed to the console.
         """
-        comando = ["cmd", "/c", "git pull origin main && dir && npm install && npm run build"]
+        self.__execute_git_pull(path)
+        self.__list_directory_contents(path)
+        self.__install_node_dependencies(path)
+        self.__build_project(path)
+
+    def __execute_git_pull(self, path: str)->None:
+        comando = ["cmd", "/c", "git pull origin main"]
         resultado = subprocess.run(comando, cwd=path, text=True, capture_output=True)
-        print("Salida del comando:", resultado.stdout)
+        print("Salida del comando git pull:", resultado.stdout)
+
+    def __list_directory_contents(self, path: str)->None:
+        comando = ["cmd", "/c", "dir"]
+        resultado = subprocess.run(comando, cwd=path, text=True, capture_output=True)
+        print("Salida del comando dir:", resultado.stdout)
+
+    def __install_node_dependencies(self, path: str)->None:
+        comando = ["cmd", "/c", "npm install"]
+        resultado = subprocess.run(comando, cwd=path, text=True, capture_output=True)
+        print("Salida del comando npm install:", resultado.stdout)
+
+    def __build_project(self, path: str)->None:
+        comando = ["cmd", "/c", "npm run build"]
+        resultado = subprocess.run(comando, cwd=path, text=True, capture_output=True)
+        print("Salida del comando npm run build:", resultado.stdout)
 
     def __prepare_object_data(self) -> dict:
         pet_info = [{
