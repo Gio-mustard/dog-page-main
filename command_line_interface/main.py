@@ -83,6 +83,14 @@ def set_data_of_owner()->bool:
 def reset_steps()->None:
     for step in STEPS:
         step['completed'] = False
+    global DATA
+    DATA = {
+        "pet_schema":None,
+        "pet_description":None,
+        "owner_schema":None,
+        "pet_photos":None
+    }
+    COMMANDS['--clear']()
     return [False,""]
 
 STEPS = [
