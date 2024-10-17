@@ -3,8 +3,10 @@ import os
 from information_manager.main import get
 import click
 from entry_point_response_manager.main import make_page
-from command_line_interface import prints as print
+from command_line_interface.prints import printer as print
 import json
+from colorama import Fore
+import subprocess
 
 DATA = {
     "pet_schema":None,
@@ -130,14 +132,62 @@ def make_next_step():
             break
     return [False,""]
 
+def add_description()->None:
+    with open('description_file.txt', 'w') as file:
+        file.write("# Your description here\n# This is a comment\n# Not include on description\n# Remember save the file before close it")
+    subprocess.run(['notepad', 'description_file.txt'])
+    def read_description()->str:
+        with open('description_file.txt', 'r') as file:
+            description = file.readlines()
+            description = "\n".join([line for line in description if not line.startswith('#')])
+        os.remove('description_file.txt')
+        return description
+    
+    print.inp("Press Enter to continue after closing the file:")
+    description = read_description()
+    if len(description) == 0:
+        return [True,"Description cannot be empty"]
+    DATA["pet_description"] = description
+    print.title("Description added on the data :]")
+    return [False,'']
+
+def add_photos()->None:
+    print.title("Add photos of your pet",decorator="-")
+    try:
+        while True:
+            path = print.inp("Enter the path of the image (or '--exit' to exit): ",custom_color=Fore.BLUE)
+            if path.lower() == '--exit': break
+
+            if not path:print.warning("Path cannot be empty.")
+
+            if 'pet_photos' not in DATA or DATA.get('pet_photos') is None: DATA['pet_photos'] = []
+            ps_to_delete = [" ","'",'"']
+            ps_to_delete.extend(ps_to_delete[::-1])
+            print.inp(f"{ps_to_delete=}")
+            path = path.replace("&","")
+            for ps in ps_to_delete:
+                path = path.removeprefix(ps).removesuffix(ps)
+
+            extension = path.split('.')[-1:]
+            valid_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
+            if  extension[0] not in valid_extensions:
+                print.warning("Invalid image extension. Please use a valid image format.")
+                continue
+            DATA['pet_photos'].append(path)
+            print.title("Image path added successfully.")
+                
+    except Exception as e:
+        return [True,str(e)]
+    return [False, '']
+
 COMMANDS = {
     "--clear":clear,
     '--exit':lambda : sys.exit(0),
     '--help':show_command_list,
     "--make-next-step":make_next_step,
     "--reset":reset_steps,
-    "--add-photos":lambda:[False,""],
-    "--add-description":lambda:[False,""],
+    "--add-photos":add_photos,
+    "--add-description":add_description,
     '--show-data':show_data,
     '--save':save_data
 }
@@ -151,7 +201,10 @@ def send_to_make_a_page()->None|str:
     pet_info['description'] = DATA["pet_description"]
     owner_info = DATA["owner_schema"]
     if DATA['pet_photos'] is not None:
-        pet_info['extra']['photos'] = DATA["pet_photos"]
+        pet_info['extra'].append({
+            "title":"photos",
+            "content":DATA['pet_photos']
+        })
     __download_page,__open_on_browser = make_page(
         pet_info=pet_info,
         owner_info=owner_info
