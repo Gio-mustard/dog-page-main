@@ -9,13 +9,16 @@ client = Groq(
 
 MODEL = "llama3-70b-8192"
 
-def __get_promt()->str:
-    with open('information_manager/prompt_to_get_schema.txt', 'r',encoding='utf8') as file:
-        return file.read()
+__get_prompt = lambda pattern :f"""
+
+    Extract the {pattern}, and any extra details (e.g., medications, favorite color) from the following  description as a JSON object. Use the exact properties as specified ({pattern}, extra). Ensure all values are in the same language as the provided description (which may be in Spanish or other languages)."""+"""
+
+    For "extra", format it as an array of objects or strings (e.g., {"title":..., "content":...}). If the content of an object is very short (10 characters or less), merge the title and content into a single string.
+    """
 
 
-def get_schema(description:str)->dict:
-    prompt = __get_promt()
+def get_schema(description:str,pattern:str)->dict:
+    prompt = __get_prompt(pattern)
     completion = client.chat.completions.create(
         model=MODEL,
         messages=[
