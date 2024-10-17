@@ -3,6 +3,7 @@ import os
 from PIL import Image
 from tkinter import filedialog
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from colorama import Fore, Style
 
 from contexts.IContactPage.interface import I as __I
 
@@ -15,7 +16,6 @@ def __init(owner_info, pet_info):
 def __download(response, on_spa:bool,initial_path:str = None):
     # ----------------------------------------------------------
     abs_path = filedialog.askdirectory() if initial_path is None else os.path.abspath(initial_path)
-    from colorama import Fore, Style
 
     print(f"{Fore.CYAN}Path to save : {abs_path}{Style.RESET_ALL}")
     def find_photos()->dict|None:
@@ -43,9 +43,9 @@ def __download(response, on_spa:bool,initial_path:str = None):
             case 0:
                   filename = 'index.html'
             case 1:
-                  filename = f'assets/style_{index}.css'
+                  filename = f'assets\\style_{index}.css'
             case 2:
-                  filename = f'assets/script_{index}.js'
+                  filename = f'assets\\script_{index}.js'
         path = abs_path +"\\"
         if not os.path.exists(path):
             os.makedirs(path, exist_ok=True)
@@ -65,11 +65,20 @@ def __download(response, on_spa:bool,initial_path:str = None):
 
     # ----------------------------------------------------------
 
-    if photos is None:return
-    photos_paths = []
-    for file in photos:
-        photo_path = __copy_file(file.replace("/",'\\'), abs_path+'\\' + 'assets\\')
-        photos_paths.append(photo_path)
+    if photos is not None:
+        photos_paths = []
+        for file in photos:
+            photo_path = __copy_file(file.replace("/",'\\'), abs_path+'\\' + 'assets\\')
+            photos_paths.append(photo_path)
+
+        for item in response.data['pet']['properties']:
+            if item['title'] == 'photos':
+                response.data['pet']['properties'].remove(item)
+
+        response.data['pet']['properties'].insert(0, {
+            "title": "photos",
+            "children": photos_paths
+        })
     # ----------------------------------------------------------
 
     import json
@@ -81,14 +90,9 @@ def __download(response, on_spa:bool,initial_path:str = None):
         mode = 'x'
     else:
         mode = 'w'
-    for item in response.data['pet']['properties']:
-        if item['title'] == 'photos':
-            response.data['pet']['properties'].remove(item)
-
-    response.data['pet']['properties'].insert(0, {
-        "title": "photos",
-        "children": photos_paths
-    })
+    print('*'*10)
+    print(f"{Fore.GREEN}Saved {Style.RESET_ALL}:{path=}")
+    print('*'*10)
     with open(path,mode=mode,encoding="utf8") as file:
         json.dump(response.data, file,indent=4)
     # ----------------------------------------------------------
@@ -111,6 +115,9 @@ def __copy_file(source_path: str, destination_path: str) -> None:
         os.makedirs(destination_path, exist_ok=True)
     filename = destination_path + os.path.basename(source_path)
     im.save(filename)
+    print('*'*10)
+    print(f"{Fore.GREEN}Saved {Style.RESET_ALL}:{filename=}")
+    print('*'*10)
     return ".\\assets\\"+os.path.basename(source_path)
 
 def __open_on_browser(response):
@@ -147,7 +154,8 @@ def make_page(owner_info, pet_info):
          'name': 'Buddy',
          'extra': ['Vaccinations up to date',
                     {
-                        "photos": ["C:/Users/sergio morquecho/Pictures/perro.jpg", "C:/Users/sergio morquecho/Pictures/34-w-Metro.jpg"]
+                        "title":"photos",
+                        "content":["C:/Users/sergio morquecho/Pictures/perro.jpg", "C:/Users/sergio morquecho/Pictures/34-w-Metro.jpg"]
                     }
                    ]
      }
