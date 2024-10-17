@@ -76,7 +76,7 @@ class I:
         """
         path = self.__get_directory()
         self.__execute_commands(path)
-        path+= "/dist/"
+        path+= r"\\dist\\"
         
         object_data = self.__prepare_object_data()
 
@@ -87,15 +87,13 @@ class I:
         self.__add_styles_to_file_manager(path)
 
         self.__add_scripts_to_file_manager(path)
-
         return IResponse(file_manager=self.__files_manager, data=object_data)
 
 
     def __get_directory(self) -> str:
         path = r"./template-page/"
         path = os.path.abspath(path)
-        path = path.replace("\\", "/")
-        print(f'JSON:{path=}')
+        path = path.replace("/", "\\")
         return path
 
     def __execute_commands(self, path: str)->None:
@@ -134,16 +132,16 @@ class I:
             "title": item,
             "children": None,
         } if type(item) is not dict else {
-            "title": list(item.keys())[0],
-            "children": list(item.values())[0],
+            "title": item.get('title'),
+            "children": item.get('content'),
         } for item in tuple(self.__pet_manager.information.pet.info.get())]
 
         owner_info = [{
             "title": item,
             "children": None,
         } if type(item) is not dict else {
-            "title": list(item.keys())[0],
-            "children": list(item.values())[0],
+            "title": item.get('title'),
+            "children": item.get('content'),
         } for item in tuple(self.__pet_manager.information.owner.info.get())]
 
         return {
@@ -173,7 +171,7 @@ class I:
             self.__files_manager.add_tag(file.read())
 
     def __add_styles_to_file_manager(self, path: str)->None:
-        css_files = glob.glob(path + 'assets/*.css')
+        css_files = glob.glob(path + r'assets\\*.css')
         if css_files:
             styles = ''
             for style_file in css_files:
@@ -182,7 +180,7 @@ class I:
             self.__files_manager.set_style(styles)
 
     def __add_scripts_to_file_manager(self, path: str)->None:
-        js_files = glob.glob(path + 'assets/*.js')
+        js_files = glob.glob(path + r'assets\\*.js')
         if js_files:
             for script_file in js_files:
                 with open(script_file, 'r') as file:
