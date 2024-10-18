@@ -7,6 +7,30 @@ from colorama import Fore, Style
 
 from contexts.IContactPage.interface import I as __I
 
+def __make_qr(url):
+
+    import qrcode
+    # Datos que quieres convertir en QR
+    data = url
+
+    # Crear el objeto QRCode
+    qr = qrcode.QRCode(
+        version=2,  # Controla el tamaño del código QR, puede ser de 1 a 40
+        error_correction=qrcode.constants.ERROR_CORRECT_L,  # Nivel de corrección de errores
+        box_size=100,  # Tamaño de cada cuadrado del QR
+        border=4,  # Tamaño del borde (4 es el mínimo recomendado)
+    )
+
+    # Añadir datos al QR
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    # Crear la imagen del QR
+    img = qr.make_image(fill="black", back_color="white")
+    img.show()
+    return img
+
+
 def __init(owner_info, pet_info):
     i = __I()
     i.add_owner_info(owner_info)
@@ -122,20 +146,33 @@ def __copy_file(source_path: str, destination_path: str) -> None:
 
 def __open_on_browser(response):
     import tempfile
+    from  threading import Thread
     with tempfile.TemporaryDirectory() as temp_dir:
         # Your code here
         __download(response, on_spa=True, initial_path=temp_dir)
-        import http.server
-        import socketserver
-        import webbrowser
-        import os
         PORT = 2307
+        import os
         os.chdir(temp_dir)
-        with socketserver.TCPServer(("", PORT), http.server.SimpleHTTPRequestHandler) as httpd:
-            print("serving at port", PORT)
-            webbrowser.open(f'http://localhost:{PORT}/index.html')
-            httpd.serve_forever()
+        import subprocess
+        
+        with open(os.path.join(temp_dir, 'script.py'), 'w') as file:
+            file.write(
+                f"""import http.server
+import socketserver
+import webbrowser
 
+with socketserver.TCPServer(("", {PORT}), http.server.SimpleHTTPRequestHandler) as httpd:
+    print("serving at port", {PORT})
+    webbrowser.open(f'http://localhost:{PORT}/index.html')
+    httpd.serve_forever()
+"""
+            )
+
+        subprocess.Popen(f"start cmd /k python {os.path.join(temp_dir, 'script.py')}", shell=True)
+        import time
+        time.sleep(5)
+        subprocess.Popen(f"start cmd /k C:\cloudflared\cloudflared.exe tunnel --url http://localhost:{PORT}/index.html",shell=True)
+        input(":")
 
 
 def make_page(owner_info, pet_info):
